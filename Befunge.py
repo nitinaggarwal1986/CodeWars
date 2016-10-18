@@ -3,6 +3,7 @@ def interpret(code):
 	arr = [[y for y in x] for x in code.split('\n')]
 	print(arr)
 	output = ""
+	stack = ""
 	
 	from numpy import random
 	
@@ -32,8 +33,8 @@ def interpret(code):
 		
 		'?' : random.choice(['>','<','v','^']),
 		
-		'_' : lambda output, x, y: [output[1:], x, y + 1 if output[1] == 0 else y - 1], 
-		'|' : lambda output, x, y: [output[1:], x + 1 if output[1] == 0 else x - 1, x],
+		'_' : lambda output: [output[1:], '>'] if output[1] == 0 else [output[1:], '<'], 
+		'|' : lambda output: [output[1:], '^'] if output[1] == 0 else [output[1:], 'v'],
 		
 		'"' : lambda output, a: [str(ord(a)) + output, 0] if a != '"' else [output, 1],
 		
@@ -42,8 +43,8 @@ def interpret(code):
 		
 		'$' : lambda output: output[1:],
 		
-		'.' : lambda output: [output[1:], int(output[0])],
-		',' : lambda output: [output[1:], chr(int(output[0]))],
+		'.' : lambda output: [output[1:], stack + str(int(output[0]))],
+		',' : lambda output: [output[1:], stack +  chr(int(output[0]))],
 		
 		'#' : lambda x, y, t: t(x, y),
 		
@@ -70,7 +71,8 @@ def interpret(code):
 			output = bDict[current](output)
 		elif current in ['_', '|']:
 			print(x, y)
-			[output, x, y] = bDict[current](output, x, y)
+			[output, dir] = bDict[current](output)
+			move = bDict[dir]
 			print(x, y)
 		elif current == '"':
 			stop = 0
@@ -80,6 +82,7 @@ def interpret(code):
 				current = arr[x][y]
 		elif current in ['.', ',']:
 			[output, disp] = bDict[current](output)
+			stack = stack + str(disp)
 		elif current == '#':
 			x, y = bDict[current](x, y, move)
 		elif current == 'p':
@@ -100,5 +103,5 @@ def interpret(code):
 		current = arr[x][y]
 		print("x = %r, y = %r, current = %r. \n output = %r" % (x, y, current, output))
 		
-		
+		print("output is actually %r" % stack)	
 	return output
