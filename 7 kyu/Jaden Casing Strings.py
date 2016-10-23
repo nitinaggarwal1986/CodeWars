@@ -1,0 +1,3 @@
+def toJadenCase(string):
+    # ...
+    return ' '.join([a.capitalize() for a in string.split()])
